@@ -6,5 +6,5 @@ use App\Models\User;
 
 Interface Achievement
 {
-    public function unlock(User $user);
+    public function unlock(User $user): bool;
 }

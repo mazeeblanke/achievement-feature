@@ -22,6 +22,10 @@ class UnlockCommentWrittenAchievement
      */
     public function handle(CommentWritten $event): void
     {
-        $this->achievement->unlock($event->comment->user);
+        $user = $event->comment->user;
+
+        if ($user) {
+            $this->achievement->unlock($user);
+        }
     }
 }

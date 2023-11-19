@@ -10,10 +10,15 @@ use App\Services\Achievements\Contracts\Achievement as AchievementContract;
 
 class CommentWritten implements AchievementContract
 {
-    public function unlock(User $user)
+    public function unlock(User $user): bool
     {
         $totalComments = $user->comments()->count();
         $commentAchievementType = AchievementType::where('name', 'comment')->first();
+
+        if (!$commentAchievementType) {
+            throw new \Exception('Achievement type not found');
+        }
+
         $achievements = Achievement::where('achievement_type_id', $commentAchievementType->id)
             ->orderBy('qualifier', 'desc')
             ->get();
@@ -26,7 +31,10 @@ class CommentWritten implements AchievementContract
         });
 
         if($unlockedAchievement) {
-            AchievementUnlocked::dispatch($unlockedAchievement->name, $user);
+            AchievementUnlocked::dispatch((string)$unlockedAchievement->name, $user);
+            return true;
         }
+
+        return false;
     }
 }

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class AchievementsController extends Controller
 {
-    public function index(User $user)
+    public function index(User $user): \Illuminate\Http\JsonResponse
     {
         return response()->json([
             'unlocked_achievements' => [],

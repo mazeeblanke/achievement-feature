@@ -64,6 +64,8 @@ class AchievementTest extends TestCase
             'achievement_id' => $this->getFirstCommentAchievement()->id,
         ]);
 
-        Event::assertDispatched(AchievementUnlocked::class);
+        Event::assertDispatched(function(AchievementUnlocked $e) {
+            return $e->achievementName === $this->getFirstCommentAchievement()->name;
+        });
     }
 }

@@ -16,7 +16,7 @@ class AchievementUnlocked
     /**
      * Create a new event instance.
      */
-    public function __construct(string $achievementName, $user)
+    public function __construct(string $achievementName, User $user)
     {
         $this->achievementName = $achievementName;
         $this->user = $user;
