@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Tests\Feature;
 
 use App\Events\AchievementUnlocked;
 use App\Events\CommentWritten;
@@ -9,7 +9,8 @@ use App\Models\Achievement;
 use App\Models\AchievementType;
 use App\Models\Comment;
 use App\Models\User;
-use App\Services\Achievements\CommentWritten as AchievementsCommentWritten;
+use App\Services\Achievements\CommentWritten as CommentWrittenService;
+use Database\Seeders\AchievementSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -35,9 +36,11 @@ class CommentWrittenAchievementTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    private function getCommentAchievement(int $offset = 0): Achievement
+    private function getAchievement(int $offset = 0): Achievement
     {
-        $achievementType = AchievementType::whereName('comment')->first();
+        $achievementType = AchievementType::whereName(
+            AchievementSeeder::COMMENT_TYPE
+        )->first();
 
         return Achievement::where('achievement_type_id', $achievementType->id)
             ->orderBy('qualifier')
@@ -54,7 +57,11 @@ class CommentWrittenAchievementTest extends TestCase
             $comment->save();
 
             $event = new CommentWritten($comment);
-            $listener = new UnlockCommentWrittenAchievement(new AchievementsCommentWritten);
+
+            $listener = new UnlockCommentWrittenAchievement(
+                new CommentWrittenService
+            );
+
             $listener->handle($event);
         });
     }
@@ -68,11 +75,11 @@ class CommentWrittenAchievementTest extends TestCase
 
         $this->assertDatabaseHas('achievement_user', [
             'user_id' => $this->user->id,
-            'achievement_id' => $this->getCommentAchievement()->id,
+            'achievement_id' => $this->getAchievement()->id,
         ]);
 
         Event::assertDispatched(function(AchievementUnlocked $e) {
-            return $e->achievementName === $this->getCommentAchievement()->name;
+            return $e->achievementName === $this->getAchievement()->name;
         });
     }
 

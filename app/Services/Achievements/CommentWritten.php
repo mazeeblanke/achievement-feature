@@ -7,34 +7,41 @@ use App\Models\Achievement as Achievement;
 use App\Models\AchievementType;
 use App\Models\User;
 use App\Services\Achievements\Contracts\Achievement as AchievementContract;
+use Database\Seeders\AchievementSeeder;
 
 class CommentWritten implements AchievementContract
 {
     public function unlock(User $user): bool
     {
         $totalComments = $user->comments()->count();
-        $commentAchievementType = AchievementType::whereName('comment')->first();
 
-        if (!$commentAchievementType) {
-            throw new \Exception('Achievement type not found');
+        $achievementType = AchievementType::whereName(
+            AchievementSeeder::COMMENT_TYPE
+        )->first();
+
+        if (!$achievementType) {
+            throw new \Exception('Comment Achievement type not found');
         }
 
-        $achievements = Achievement::where('achievement_type_id', $commentAchievementType->id)
-            ->orderBy('qualifier', 'desc')
+        $achievements = Achievement::where('achievement_type_id', $achievementType->id)
+            ->orderBy('qualifier')
             ->get();
 
-        $unlockedAchievement = $achievements->first(function ($achievement) use ($totalComments, $user) {
-            if ($totalComments === $achievement->qualifier) {
-                $user->achievements()->attach($achievement->id);
-                return true;
-            }
-        });
+        $unlockedAchievements = $user->achievements
+            ->pluck('id')
+            ->toArray();
 
-        if($unlockedAchievement) {
-            AchievementUnlocked::dispatch((string)$unlockedAchievement->name, $user);
-            return true;
+        $unlockedAchievements = $achievements->filter(fn($achievement) =>
+            !in_array($achievement->id, $unlockedAchievements) &&
+            $totalComments >= $achievement->qualifier
+        );
+
+        // Unlock all applicable achievements
+        foreach ($unlockedAchievements as $achievement) {
+            $user->achievements()->attach($achievement->id);
+            AchievementUnlocked::dispatch((string)$achievement->name, $user);
         }
 
-        return false;
+        return $unlockedAchievements->count() > 0;
     }
 }
