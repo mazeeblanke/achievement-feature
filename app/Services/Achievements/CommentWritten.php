@@ -13,7 +13,7 @@ class CommentWritten implements AchievementContract
     public function unlock(User $user): bool
     {
         $totalComments = $user->comments()->count();
-        $commentAchievementType = AchievementType::where('name', 'comment')->first();
+        $commentAchievementType = AchievementType::whereName('comment')->first();
 
         if (!$commentAchievementType) {
             throw new \Exception('Achievement type not found');
@@ -24,7 +24,7 @@ class CommentWritten implements AchievementContract
             ->get();
 
         $unlockedAchievement = $achievements->first(function ($achievement) use ($totalComments, $user) {
-            if ($totalComments >= $achievement->qualifier) {
+            if ($totalComments === $achievement->qualifier) {
                 $user->achievements()->attach($achievement->id);
                 return true;
             }
