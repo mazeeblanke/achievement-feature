@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->integer('qualifier')->nullable(false);
             $table->foreignId('achievement_type_id')->nullable(false)->constrained();
+            $table->unique(['name', 'qualifier']);
             $table->timestamps();
         });
     }
