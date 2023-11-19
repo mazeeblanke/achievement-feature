@@ -45,7 +45,7 @@ class LessonWatchedAchievementTest extends TestCase
                 'watched' => 1,
             ]);
 
-            $event = new LessonWatched($lesson, $this->user);
+            $event = new LessonWatched($lesson, $this->user->fresh());
 
             $listener = new UnlockLessonWatchedAchievement(
                 new LessonWatchedService
@@ -71,7 +71,7 @@ class LessonWatchedAchievementTest extends TestCase
     /**
      * @test
      */
-    public function a_user_can_unlock_the_lesson_written_achievement(): void
+    public function a_user_can_unlock_the_lesson_watched_achievement(): void
     {
         Event::fake();
 
@@ -85,5 +85,54 @@ class LessonWatchedAchievementTest extends TestCase
         Event::assertDispatched(function(AchievementUnlocked $e) {
             return $e->achievementName === $this->getAchievement()->name;
         });
+    }
+
+     /** @test */
+     public function achievements_are_unlocked_as_more_lessons_are_watched(): void
+     {
+         Event::fake();
+
+         // creates first comment
+         $this->createWatchedLessons(1);
+
+         // creates 4 more comments
+         $this->createWatchedLessons(4);
+
+         // And creates 8 more comments
+         $this->createWatchedLessons(8);
+
+         // There should be 4 achievements unlocked matching 1, 5, 10
+         Event::assertDispatched(AchievementUnlocked::class, 3);
+
+         $this->assertDatabaseCount('achievement_user', 3);
+    }
+
+    /** @test */
+    public function newly_added_achievements_are_unlocked_as_more_lessons_are_watched(): void
+    {
+        Event::fake();
+
+        // creates first comment
+        $this->createWatchedLessons(1);
+
+        // creates 4 more comments
+        $this->createWatchedLessons(4);
+
+        // Add a new lesson achievement
+        Achievement::factory()->create([
+            'achievement_type_id' => AchievementType::whereName(
+                AchievementSeeder::LESSON_TYPE
+            )->first()->id,
+            'qualifier' => 3,
+            'name' => 'Watch 3 lessons'
+        ]);
+
+        // creates 8 more comments
+        $this->createWatchedLessons(8);
+
+        // There should be 4 achievements unlocked matching 1, *3*, 5, 10
+        Event::assertDispatched(AchievementUnlocked::class, 4);
+
+        $this->assertDatabaseCount('achievement_user', 4);
     }
 }

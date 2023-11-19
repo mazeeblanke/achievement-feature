@@ -102,4 +102,33 @@ class CommentWrittenAchievementTest extends TestCase
 
         $this->assertDatabaseCount('achievement_user', 4);
     }
+
+    /** @test */
+    public function newly_added_achievements_are_unlocked_as_more_comments_are_written(): void
+    {
+        Event::fake();
+
+        // creates first comment
+        $this->createComments(1);
+
+        // creates 4 more comments
+        $this->createComments(4);
+
+        // Add new achievement
+        Achievement::factory()->create([
+            'achievement_type_id' => AchievementType::whereName(
+                AchievementSeeder::COMMENT_TYPE
+            )->first()->id,
+            'qualifier' => 2,
+            'name' => '2 Comments Written'
+        ]);
+
+        // And creates 8 more comments
+        $this->createComments(8);
+
+        // There should be 4 achievements unlocked matching 1, 3, 5, 10
+        Event::assertDispatched(AchievementUnlocked::class, 5);
+
+        $this->assertDatabaseCount('achievement_user', 5);
+    }
 }
