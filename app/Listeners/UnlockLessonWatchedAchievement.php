@@ -2,24 +2,26 @@
 
 namespace App\Listeners;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Events\LessonWatched;
+use App\Services\Achievements\LessonWatched as LessonWatchedService;
 
 class UnlockLessonWatchedAchievement
 {
+    private LessonWatchedService $achievement;
+
     /**
      * Create the event listener.
      */
-    public function __construct()
+    public function __construct(LessonWatchedService $achievement)
     {
-        //
+        $this->achievement = $achievement;
     }
 
     /**
      * Handle the event.
      */
-    public function handle(object $event): void
+    public function handle(LessonWatched $event): void
     {
-        //
+        $this->achievement->unlock($event->user);
     }
 }
