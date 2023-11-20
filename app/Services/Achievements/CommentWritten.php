@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\AchievementType;
 use App\Events\AchievementUnlocked;
 use Database\Seeders\AchievementSeeder;
-use App\Models\Achievement as Achievement;
+use App\Models\Achievement;
 use App\Services\Achievements\Contracts\Achievement as AchievementContract;
 
 class CommentWritten implements AchievementContract
