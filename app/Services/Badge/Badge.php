@@ -14,8 +14,9 @@ class Badge implements BadgeContract
     {
         $numberOfAchievements = $user->achievements()->count();
         $currentBadge = $user->badge;
+        $currentNumberOfAchievements = $currentBadge->no_of_achievements ?? 0;
 
-        $badges = ModelsBadge::where('no_of_achievements', '>', $currentBadge->no_of_achievements)
+        $badges = ModelsBadge::where('no_of_achievements', '>', $currentNumberOfAchievements)
             ->orderBy('no_of_achievements', 'desc')
             ->get();
 
@@ -30,6 +31,6 @@ class Badge implements BadgeContract
             BadgeUnlocked::dispatch($newBadge->name, $user);
         }
 
-        return $newBadge && $currentBadge->id !== $newBadge->id;
+        return $currentBadge !== $newBadge;
     }
 }
