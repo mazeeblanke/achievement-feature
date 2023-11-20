@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\AchievementType;
 use Tests\TestCase;
 use App\Models\User;
+use Database\Seeders\AchievementSeeder;
 use Tests\Traits\Achievement;
 use Database\Seeders\BadgeSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,6 +16,10 @@ class AchievementTest extends TestCase
     use Achievement;
 
     private User $user;
+
+    private AchievementType $commentType;
+
+    private AchievementType $lessonType;
 
     protected function setUp(): void
     {
@@ -27,6 +33,14 @@ class AchievementTest extends TestCase
         ]);
 
         $this->actingAs($this->user);
+
+        $this->commentType = AchievementType::whereName(
+            AchievementSeeder::COMMENT_TYPE
+        )->first();
+
+        $this->lessonType = AchievementType::whereName(
+            AchievementSeeder::LESSON_TYPE
+        )->first();
     }
 
     /**
@@ -55,45 +69,63 @@ class AchievementTest extends TestCase
         ]);
     }
 
+    private function getAvalAchievements(int $comments, int $watchedLessons): array
+    {
+        $commentAchievements = $this->commentType->achievements->filter(fn($achievement) =>
+            $achievement->qualifier <= $comments
+        )->pluck('name');
+
+        $lessonAchievements = $this->lessonType->achievements->filter(fn($achievement) =>
+            $achievement->qualifier <= $watchedLessons
+        )->pluck('name');
+
+        return $commentAchievements->merge($lessonAchievements)->toArray();
+    }
+
+    private function getNextAchievements(int $comments, int $watchedLessons): array
+    {   $nextAchievements = [];
+
+        $nextLessonAchievement = $this->lessonType->achievements->filter(fn($achievement) =>
+            $achievement->qualifier > $watchedLessons
+        )->first();
+
+        $nextCommentAchievement = $this->commentType->achievements->filter(fn($achievement) =>
+            $achievement->qualifier > $comments
+        )->first();
+
+        if($nextCommentAchievement) {
+            $nextAchievements[] = $nextCommentAchievement->name;
+        }
+
+        if ($nextLessonAchievement) {
+            $nextAchievements[] = $nextLessonAchievement->name;
+        }
+
+        return $nextAchievements;
+    }
+
     /**
      * @test
     */
     public function it_returns_the_valid_response_for_a_user(): void
     {
-        // Seeded data
-        // LESSON_ACHIEVEMENTS = [
-        //     1 => 'First Lesson Watched',
-        //     5 => '5 Lessons Watched',
-        //     10 => '10 Lessons Watched',
-        //     25 => '25 Lessons Watched',
-        //     50 => '50 Lessons Watched',
-        // ];
+        $comments = 1;
+        $watchedLessons = 6;
 
-        // COMMENT_ACHIEVEMENTS = [
-        //     1 => 'First Comment Written',
-        //     3 => '3 Comments Written',
-        //     5 => '5 Comments Written',
-        //     10 => '10 Comments Written',
-        //     20 => '20 Comments Written',
-        // ];
-
-        $this->createComments(1);
-        $this->createWatchedLessons(6);
+        $this->createComments($comments);
+        $this->createWatchedLessons($watchedLessons);
 
         $user = $this->user->fresh();
 
         $response = $this->get("/users/{$user->id}/achievements");
 
+        $avalAchievements = $this->getAvalAchievements($comments, $watchedLessons);
+
+        $nextAchievements = $this->getNextAchievements($comments, $watchedLessons);
+
         $response->assertJson([
-            'unlocked_achievements' => [
-                'First Comment Written',
-                'First Lesson Watched',
-                '5 Lessons Watched',
-            ],
-            'next_available_achievements' => [
-                '3 Comments Written',
-                '10 Lessons Watched',
-            ],
+            'unlocked_achievements' => $avalAchievements,
+            'next_available_achievements' => $nextAchievements,
             'current_badge' => BadgeSeeder::BEGINNER,
             'next_badge' => BadgeSeeder::INTERMEDIATE,
             'remaining_to_unlock_next_badge' => 1,
@@ -105,28 +137,23 @@ class AchievementTest extends TestCase
     */
     public function it_returns_the_valid_response_for_a_user_on_more_achievements(): void
     {
-        $this->createComments(15);
-        $this->createWatchedLessons(28);
+        $comments = 15;
+        $watchedLessons = 28;
+
+        $this->createComments($comments);
+        $this->createWatchedLessons($watchedLessons);
 
         $user = $this->user->fresh();
 
         $response = $this->get("/users/{$user->id}/achievements");
 
+        $avalAchievements = $this->getAvalAchievements($comments, $watchedLessons);
+
+        $nextAchievements = $this->getNextAchievements($comments, $watchedLessons);
+
         $response->assertJson([
-            'unlocked_achievements' => [
-                'First Comment Written',
-                '3 Comments Written',
-                '5 Comments Written',
-                '10 Comments Written',
-                'First Lesson Watched',
-                '5 Lessons Watched',
-                '10 Lessons Watched',
-                '25 Lessons Watched',
-            ],
-            'next_available_achievements' => [
-                '20 Comments Written',
-                '50 Lessons Watched',
-            ],
+            'unlocked_achievements' => $avalAchievements,
+            'next_available_achievements' => $nextAchievements,
             'current_badge' => BadgeSeeder::ADVANCED,
             'next_badge' => BadgeSeeder::MASTER,
             'remaining_to_unlock_next_badge' => 2,
