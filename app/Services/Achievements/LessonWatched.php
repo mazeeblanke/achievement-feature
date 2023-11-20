@@ -7,10 +7,15 @@ use App\Models\Achievement;
 use App\Models\AchievementType;
 use App\Events\AchievementUnlocked;
 use Database\Seeders\AchievementSeeder;
-use App\Services\Achievements\Contracts\Achievement as AchievementContract;
+use App\Services\Achievements\Contracts\AchievementType as AchievementContract;
 
 class LessonWatched implements AchievementContract
 {
+    public function nextAvailableAchievements(User $user): string
+    {
+        return '';
+    }
+
     public function unlock(User $user): bool
     {
         $totalWatched = $user->watched()->count();

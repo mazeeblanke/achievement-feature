@@ -6,18 +6,17 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Lesson;
 use App\Models\Achievement;
-use App\Events\LessonWatched;
 use App\Models\AchievementType;
 use App\Events\AchievementUnlocked;
 use Illuminate\Support\Facades\Event;
 use Database\Seeders\AchievementSeeder;
-use App\Listeners\UnlockLessonWatchedAchievement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Services\Achievements\Contracts\Achievement as AchievementService;
+use Tests\Traits\Achievement as TraitsAchievement;
 
 class LessonWatchedAchievementTest extends TestCase
 {
     use RefreshDatabase;
+    use TraitsAchievement;
 
     private User $user;
     private Lesson $lesson;
@@ -34,25 +33,6 @@ class LessonWatchedAchievementTest extends TestCase
         ]);
 
         $this->actingAs($this->user);
-    }
-
-    private function createWatchedLessons(int $count): void
-    {
-        Lesson::factory($count)->make()->each(function ($lesson) {
-            $lesson->save();
-
-            $this->user->watched()->attach($lesson->id, [
-                'watched' => 1,
-            ]);
-
-            $event = new LessonWatched($lesson, $this->user->fresh());
-
-            $listener = new UnlockLessonWatchedAchievement(
-                resolve(AchievementService::class)
-            );
-
-            $listener->handle($event);
-        });
     }
 
     private function getAchievement(int $offset = 0): Achievement

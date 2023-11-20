@@ -7,14 +7,42 @@ use App\Models\AchievementType;
 use App\Events\AchievementUnlocked;
 use Database\Seeders\AchievementSeeder;
 use App\Models\Achievement;
-use App\Services\Achievements\Contracts\Achievement as AchievementContract;
+use App\Services\Achievements\Contracts\AchievementType as AchievementContract;
 
 class CommentWritten implements AchievementContract
 {
+    public function nextAvailableAchievements(User $user): string
+    {
+        $type = $this->getAchievementType();
+
+        $latestAchievement = $user->achievements()
+            ->where('achievement_type_id', $type->id)
+            ->orderBy('qualifier');
+            
+        return '';
+    }
+
     public function unlock(User $user): bool
     {
         $totalComments = $user->comments()->count();
 
+        $unlockableAchievements = $this->getUnlockableAchievements(
+            $this->getAchievementType(),
+            $user,
+            $totalComments
+        );
+
+        // Unlock all applicable achievements
+        foreach ($unlockableAchievements as $achievement) {
+            $user->achievements()->attach($achievement->id);
+            AchievementUnlocked::dispatch((string)$achievement->name, $user);
+        }
+
+        return $unlockableAchievements->count() > 0;
+    }
+
+    private function getAchievementType(): AchievementType
+    {
         $achievementType = AchievementType::whereName(
             AchievementSeeder::COMMENT_TYPE
         )->first();
@@ -23,7 +51,12 @@ class CommentWritten implements AchievementContract
             throw new \Exception('Comment Achievement type not found');
         }
 
-        $achievements = Achievement::where('achievement_type_id', $achievementType->id)
+        return $achievementType;
+    }
+
+    private function getUnlockableAchievements(AchievementType $achievementType, User $user, int $totalComments)
+    {
+        $allAchievements = Achievement::where('achievement_type_id', $achievementType->id)
             ->orderBy('qualifier')
             ->get();
 
@@ -31,18 +64,10 @@ class CommentWritten implements AchievementContract
             ->pluck('id')
             ->toArray();
 
-        $unlockedAchievements = $achievements->filter(
+        return $allAchievements->filter(
             fn ($achievement) =>
             !in_array($achievement->id, $unlockedAchievements) &&
             $totalComments >= $achievement->qualifier
         );
-
-        // Unlock all applicable achievements
-        foreach ($unlockedAchievements as $achievement) {
-            $user->achievements()->attach($achievement->id);
-            AchievementUnlocked::dispatch((string)$achievement->name, $user);
-        }
-
-        return $unlockedAchievements->count() > 0;
     }
 }

@@ -4,19 +4,14 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\User;
-use App\Models\Lesson;
-use App\Models\Comment;
-use App\Events\LessonWatched;
-use App\Events\CommentWritten;
 use Database\Seeders\BadgeSeeder;
-use App\Listeners\UnlockLessonWatchedAchievement;
-use App\Listeners\UnlockCommentWrittenAchievement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Services\Achievements\Contracts\Achievement as AchievementService;
+use Tests\Traits\Achievement;
 
 class BadgeTest extends TestCase
 {
     use RefreshDatabase;
+    use Achievement;
 
     private User $user;
 
@@ -32,42 +27,6 @@ class BadgeTest extends TestCase
         ]);
 
         $this->actingAs($this->user);
-    }
-
-    private function createComments(int $count): void
-    {
-        Comment::factory($count)->make([
-            'user_id' => $this->user->id,
-        ])->each(function ($comment) {
-            $comment->save();
-
-            $event = new CommentWritten($comment);
-
-            $listener = new UnlockCommentWrittenAchievement(
-                resolve(AchievementService::class)
-            );
-
-            $listener->handle($event);
-        });
-    }
-
-    private function createWatchedLessons(int $count): void
-    {
-        Lesson::factory($count)->make()->each(function ($lesson) {
-            $lesson->save();
-
-            $this->user->watched()->attach($lesson->id, [
-                'watched' => 1,
-            ]);
-
-            $event = new LessonWatched($lesson, $this->user->fresh());
-
-            $listener = new UnlockLessonWatchedAchievement(
-                resolve(AchievementService::class)
-            );
-
-            $listener->handle($event);
-        });
     }
 
     /** @test */

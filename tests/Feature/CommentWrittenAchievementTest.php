@@ -6,19 +6,17 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Comment;
 use App\Models\Achievement;
-use App\Events\CommentWritten;
 use App\Models\AchievementType;
 use App\Events\AchievementUnlocked;
 use Illuminate\Support\Facades\Event;
 use Database\Seeders\AchievementSeeder;
-use App\Listeners\UnlockCommentWrittenAchievement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Services\Achievements\Contracts\Achievement as AchievementService;
-
+use Tests\Traits\Achievement as TraitsAchievement;
 
 class CommentWrittenAchievementTest extends TestCase
 {
     use RefreshDatabase;
+    use TraitsAchievement;
 
     private User $user;
     private Comment $comment;
@@ -48,23 +46,6 @@ class CommentWrittenAchievementTest extends TestCase
             ->offset($offset)
             ->limit(1)
             ->first();
-    }
-
-    private function createComments(int $count): void
-    {
-        Comment::factory($count)->make([
-            'user_id' => $this->user->id,
-        ])->each(function ($comment) {
-            $comment->save();
-
-            $event = new CommentWritten($comment);
-
-            $listener = new UnlockCommentWrittenAchievement(
-                resolve(AchievementService::class)
-            );
-
-            $listener->handle($event);
-        });
     }
 
     /** @test */

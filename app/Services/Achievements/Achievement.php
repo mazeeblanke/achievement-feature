@@ -30,7 +30,9 @@ class Achievement implements Contracts\Achievement
 
     public function unlockedAchievements(User $user): array
     {
-        return [];
+        return $user->achievements
+            ->pluck('name')
+            ->toArray();
     }
 
     public function nextAvailableAchievements(User $user): array
