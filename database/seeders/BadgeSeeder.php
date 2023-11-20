@@ -20,22 +20,22 @@ class BadgeSeeder extends Seeder
     {
         Badge::firstOrCreate([
             'name' => self::BEGINNER,
-            'no_of_achievement' => 0,
+            'no_of_achievements' => 0,
         ]);
 
         Badge::firstOrCreate([
             'name' => self::INTERMEDIATE,
-            'no_of_achievement' => 4,
+            'no_of_achievements' => 4,
         ]);
 
         Badge::firstOrCreate([
             'name' => self::ADVANCED,
-            'no_of_achievement' => 8,
+            'no_of_achievements' => 8,
         ]);
 
         Badge::firstOrCreate([
             'name' => self::MASTER,
-            'no_of_achievement' => 10,
+            'no_of_achievements' => 10,
         ]);
     }
 }
