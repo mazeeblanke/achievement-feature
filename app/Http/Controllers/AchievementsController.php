@@ -11,13 +11,9 @@ class AchievementsController extends Controller
     /**
      * Get the achievements for the given user.
      *
-     * @param   User                $user
-     * @param   BadgeService        $badgeService
-     * @param   AchievementService  $achievementService
-     *
      * @return  \Illuminate\Http\JsonResponse
      */
-    public function index($user, $badgeService, $achievementService)
+    public function index(User $user, BadgeService $badgeService, AchievementService $achievementService)
     {
         return response()->json([
             'unlocked_achievements' => $achievementService->unlockedAchievements($user),
