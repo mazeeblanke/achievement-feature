@@ -8,7 +8,8 @@ use Illuminate\Foundation\Events\Dispatchable;
 
 class CommentWritten
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     public Comment $comment;
 

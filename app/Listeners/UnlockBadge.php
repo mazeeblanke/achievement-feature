@@ -14,7 +14,7 @@ class UnlockBadge
      */
     public function __construct(BadgeService $badgeService)
     {
-       $this->badgeService = $badgeService;
+        $this->badgeService = $badgeService;
     }
 
     /**

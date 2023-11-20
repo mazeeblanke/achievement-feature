@@ -2,10 +2,9 @@
 
 namespace Tests\Unit;
 
+use Tests\TestCase;
 use App\Models\Achievement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-// use PHPUnit\Framework\TestCase;
-use Tests\TestCase;
 
 class AchievementTest extends TestCase
 {
@@ -19,7 +18,7 @@ class AchievementTest extends TestCase
         $name = 'First Achievement';
 
         $achievement = Achievement::factory()->create([
-            'name' => $name
+            'name' => $name,
         ]);
 
         $this->assertEquals($name, $achievement->name);

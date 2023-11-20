@@ -3,12 +3,13 @@
 namespace App\Events;
 
 use App\Models\User;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Foundation\Events\Dispatchable;
 
 class AchievementUnlocked
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     public string $achievementName;
     public User $user;

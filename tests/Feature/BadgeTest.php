@@ -2,19 +2,18 @@
 
 namespace Tests\Feature;
 
-use App\Events\BadgeUnlocked;
-use App\Events\CommentWritten;
-use App\Events\LessonWatched;
-use App\Listeners\UnlockCommentWrittenAchievement;
-use App\Listeners\UnlockLessonWatchedAchievement;
-use App\Models\Comment;
-use App\Models\Lesson;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Services\Achievements\CommentWritten as CommentWrittenService;
-use App\Services\Achievements\LessonWatched as LessonWatchedService;
-use Database\Seeders\BadgeSeeder;
 use Tests\TestCase;
+use App\Models\User;
+use App\Models\Lesson;
+use App\Models\Comment;
+use App\Events\LessonWatched;
+use App\Events\CommentWritten;
+use Database\Seeders\BadgeSeeder;
+use App\Listeners\UnlockLessonWatchedAchievement;
+use App\Listeners\UnlockCommentWrittenAchievement;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Services\Achievements\LessonWatched as LessonWatchedService;
+use App\Services\Achievements\CommentWritten as CommentWrittenService;
 
 class BadgeTest extends TestCase
 {
@@ -22,7 +21,7 @@ class BadgeTest extends TestCase
 
     private User $user;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +29,7 @@ class BadgeTest extends TestCase
 
         $this->user = User::factory()->create([
             'name' => 'test user',
-            'email' => 'test@test.com'
+            'email' => 'test@test.com',
         ]);
 
         $this->actingAs($this->user);
@@ -46,7 +45,7 @@ class BadgeTest extends TestCase
             $event = new CommentWritten($comment);
 
             $listener = new UnlockCommentWrittenAchievement(
-                new CommentWrittenService
+                new CommentWrittenService()
             );
 
             $listener->handle($event);
@@ -65,7 +64,7 @@ class BadgeTest extends TestCase
             $event = new LessonWatched($lesson, $this->user->fresh());
 
             $listener = new UnlockLessonWatchedAchievement(
-                new LessonWatchedService
+                new LessonWatchedService()
             );
 
             $listener->handle($event);

@@ -3,12 +3,13 @@
 namespace App\Events;
 
 use App\Models\User;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Foundation\Events\Dispatchable;
 
 class BadgeUnlocked
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     public string $badgeName;
     public User $user;

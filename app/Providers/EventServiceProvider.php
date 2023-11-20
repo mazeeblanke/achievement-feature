@@ -2,16 +2,15 @@
 
 namespace App\Providers;
 
-use App\Events\AchievementUnlocked;
-use App\Events\CommentWritten;
 use App\Events\LessonWatched;
+use App\Events\CommentWritten;
 use App\Listeners\UnlockBadge;
-use App\Listeners\UnlockCommentWrittenAchievement;
-use App\Listeners\UnlockLessonWatchedAchievement;
+use App\Events\AchievementUnlocked;
 use Illuminate\Auth\Events\Registered;
+use App\Listeners\UnlockLessonWatchedAchievement;
+use App\Listeners\UnlockCommentWrittenAchievement;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -25,14 +24,14 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         CommentWritten::class => [
-            UnlockCommentWrittenAchievement::class
+            UnlockCommentWrittenAchievement::class,
         ],
         LessonWatched::class => [
-            UnlockLessonWatchedAchievement::class
+            UnlockLessonWatchedAchievement::class,
         ],
         AchievementUnlocked::class => [
-            UnlockBadge::class
-        ]
+            UnlockBadge::class,
+        ],
     ];
 
     /**

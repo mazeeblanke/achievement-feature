@@ -3,10 +3,10 @@
 namespace Database\Factories;
 
 use App\Models\Badge;
-use Database\Seeders\BadgeSeeder;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Database\Seeders\BadgeSeeder;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>

@@ -9,7 +9,8 @@ use Illuminate\Foundation\Events\Dispatchable;
 
 class LessonWatched
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     public Lesson $lesson;
     public User $user;

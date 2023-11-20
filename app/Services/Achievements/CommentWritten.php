@@ -2,12 +2,12 @@
 
 namespace App\Services\Achievements;
 
-use App\Events\AchievementUnlocked;
-use App\Models\Achievement as Achievement;
-use App\Models\AchievementType;
 use App\Models\User;
-use App\Services\Achievements\Contracts\Achievement as AchievementContract;
+use App\Models\AchievementType;
+use App\Events\AchievementUnlocked;
 use Database\Seeders\AchievementSeeder;
+use App\Models\Achievement as Achievement;
+use App\Services\Achievements\Contracts\Achievement as AchievementContract;
 
 class CommentWritten implements AchievementContract
 {
@@ -31,7 +31,8 @@ class CommentWritten implements AchievementContract
             ->pluck('id')
             ->toArray();
 
-        $unlockedAchievements = $achievements->filter(fn($achievement) =>
+        $unlockedAchievements = $achievements->filter(
+            fn ($achievement) =>
             !in_array($achievement->id, $unlockedAchievements) &&
             $totalComments >= $achievement->qualifier
         );

@@ -2,11 +2,10 @@
 
 namespace App\Services\Badge;
 
+use App\Models\User;
 use App\Events\BadgeUnlocked;
 use App\Models\Badge as ModelsBadge;
-use App\Models\User;
 use App\Services\Badge\Contracts\Badge as BadgeContract;
-use Illuminate\Support\Facades\Log;
 
 class Badge implements BadgeContract
 {
@@ -20,7 +19,8 @@ class Badge implements BadgeContract
             ->orderBy('no_of_achievements', 'desc')
             ->get();
 
-        $newBadge = $badges->first(fn($badge) =>
+        $newBadge = $badges->first(
+            fn ($badge) =>
             $badge->no_of_achievements <= $numberOfAchievements &&
             $currentBadge !== $badge
         );

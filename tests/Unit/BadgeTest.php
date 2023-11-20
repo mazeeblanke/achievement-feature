@@ -2,9 +2,9 @@
 
 namespace Tests\Unit;
 
+use Tests\TestCase;
 use App\Models\Badge;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 class BadgeTest extends TestCase
 {
@@ -56,7 +56,7 @@ class BadgeTest extends TestCase
         ]);
 
         $this->assertEquals($noOfAchievements, $badge->no_of_achievements);
-        
+
         $this->assertDatabaseHas('badges', [
             'no_of_achievements' => $noOfAchievements,
         ]);

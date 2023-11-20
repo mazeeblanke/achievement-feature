@@ -4,7 +4,7 @@ namespace App\Services\Achievements\Contracts;
 
 use App\Models\User;
 
-Interface Achievement
+interface Achievement
 {
     public function unlock(User $user): bool;
 }

@@ -2,12 +2,12 @@
 
 namespace App\Services\Achievements;
 
-use App\Events\AchievementUnlocked;
+use App\Models\User;
 use App\Models\Achievement;
 use App\Models\AchievementType;
-use App\Models\User;
-use App\Services\Achievements\Contracts\Achievement as AchievementContract;
+use App\Events\AchievementUnlocked;
 use Database\Seeders\AchievementSeeder;
+use App\Services\Achievements\Contracts\Achievement as AchievementContract;
 
 class LessonWatched implements AchievementContract
 {
@@ -31,7 +31,8 @@ class LessonWatched implements AchievementContract
             ->pluck('id')
             ->toArray();
 
-        $unlockedAchievements = $achievements->filter(fn($achievement) =>
+        $unlockedAchievements = $achievements->filter(
+            fn ($achievement) =>
             !in_array($achievement->id, $unlockedAchievements) &&
             $totalWatched >= $achievement->qualifier
         );

@@ -2,18 +2,18 @@
 
 namespace Tests\Feature;
 
-use App\Events\AchievementUnlocked;
-use App\Events\CommentWritten;
-use App\Listeners\UnlockCommentWrittenAchievement;
-use App\Models\Achievement;
-use App\Models\AchievementType;
-use App\Models\Comment;
-use App\Models\User;
-use App\Services\Achievements\CommentWritten as CommentWrittenService;
-use Database\Seeders\AchievementSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use App\Models\User;
+use App\Models\Comment;
+use App\Models\Achievement;
+use App\Events\CommentWritten;
+use App\Models\AchievementType;
+use App\Events\AchievementUnlocked;
+use Illuminate\Support\Facades\Event;
+use Database\Seeders\AchievementSeeder;
+use App\Listeners\UnlockCommentWrittenAchievement;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Services\Achievements\CommentWritten as CommentWrittenService;
 
 class CommentWrittenAchievementTest extends TestCase
 {
@@ -22,7 +22,7 @@ class CommentWrittenAchievementTest extends TestCase
     private User $user;
     private Comment $comment;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +30,7 @@ class CommentWrittenAchievementTest extends TestCase
 
         $this->user = User::factory()->create([
             'name' => 'test user',
-            'email' => 'test@test.com'
+            'email' => 'test@test.com',
         ]);
 
         $this->actingAs($this->user);
@@ -59,7 +59,7 @@ class CommentWrittenAchievementTest extends TestCase
             $event = new CommentWritten($comment);
 
             $listener = new UnlockCommentWrittenAchievement(
-                new CommentWrittenService
+                new CommentWrittenService()
             );
 
             $listener->handle($event);
@@ -78,7 +78,7 @@ class CommentWrittenAchievementTest extends TestCase
             'achievement_id' => $this->getAchievement()->id,
         ]);
 
-        Event::assertDispatched(function(AchievementUnlocked $e) {
+        Event::assertDispatched(function (AchievementUnlocked $e) {
             return $e->achievementName === $this->getAchievement()->name;
         });
     }
@@ -120,7 +120,7 @@ class CommentWrittenAchievementTest extends TestCase
                 AchievementSeeder::COMMENT_TYPE
             )->first()->id,
             'qualifier' => 2,
-            'name' => '2 Comments Written'
+            'name' => '2 Comments Written',
         ]);
 
         // And creates 8 more comments

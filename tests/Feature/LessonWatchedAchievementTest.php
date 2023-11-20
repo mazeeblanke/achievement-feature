@@ -2,18 +2,18 @@
 
 namespace Tests\Feature;
 
-use App\Events\AchievementUnlocked;
-use App\Events\LessonWatched;
-use App\Listeners\UnlockLessonWatchedAchievement;
-use App\Models\Achievement;
-use App\Models\AchievementType;
-use App\Models\Lesson;
-use App\Models\User;
-use App\Services\Achievements\LessonWatched as LessonWatchedService;
-use Database\Seeders\AchievementSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use App\Models\User;
+use App\Models\Lesson;
+use App\Models\Achievement;
+use App\Events\LessonWatched;
+use App\Models\AchievementType;
+use App\Events\AchievementUnlocked;
+use Illuminate\Support\Facades\Event;
+use Database\Seeders\AchievementSeeder;
+use App\Listeners\UnlockLessonWatchedAchievement;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Services\Achievements\LessonWatched as LessonWatchedService;
 
 class LessonWatchedAchievementTest extends TestCase
 {
@@ -22,7 +22,7 @@ class LessonWatchedAchievementTest extends TestCase
     private User $user;
     private Lesson $lesson;
 
-    protected function setUp() :void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +30,7 @@ class LessonWatchedAchievementTest extends TestCase
 
         $this->user = User::factory()->create([
             'name' => 'test user',
-            'email' => 'test@test.com'
+            'email' => 'test@test.com',
         ]);
 
         $this->actingAs($this->user);
@@ -48,7 +48,7 @@ class LessonWatchedAchievementTest extends TestCase
             $event = new LessonWatched($lesson, $this->user->fresh());
 
             $listener = new UnlockLessonWatchedAchievement(
-                new LessonWatchedService
+                new LessonWatchedService()
             );
 
             $listener->handle($event);
@@ -82,29 +82,29 @@ class LessonWatchedAchievementTest extends TestCase
             'achievement_id' => $this->getAchievement()->id,
         ]);
 
-        Event::assertDispatched(function(AchievementUnlocked $e) {
+        Event::assertDispatched(function (AchievementUnlocked $e) {
             return $e->achievementName === $this->getAchievement()->name;
         });
     }
 
-     /** @test */
-     public function achievements_are_unlocked_as_more_lessons_are_watched(): void
-     {
-         Event::fake();
+    /** @test */
+    public function achievements_are_unlocked_as_more_lessons_are_watched(): void
+    {
+        Event::fake();
 
-         // creates first comment
-         $this->createWatchedLessons(1);
+        // creates first comment
+        $this->createWatchedLessons(1);
 
-         // creates 4 more comments
-         $this->createWatchedLessons(4);
+        // creates 4 more comments
+        $this->createWatchedLessons(4);
 
-         // And creates 8 more comments
-         $this->createWatchedLessons(8);
+        // And creates 8 more comments
+        $this->createWatchedLessons(8);
 
-         // There should be 4 achievements unlocked matching 1, 5, 10
-         Event::assertDispatched(AchievementUnlocked::class, 3);
+        // There should be 4 achievements unlocked matching 1, 5, 10
+        Event::assertDispatched(AchievementUnlocked::class, 3);
 
-         $this->assertDatabaseCount('achievement_user', 3);
+        $this->assertDatabaseCount('achievement_user', 3);
     }
 
     /** @test */
@@ -124,7 +124,7 @@ class LessonWatchedAchievementTest extends TestCase
                 AchievementSeeder::LESSON_TYPE
             )->first()->id,
             'qualifier' => 3,
-            'name' => 'Watch 3 lessons'
+            'name' => 'Watch 3 lessons',
         ]);
 
         // creates 8 more comments
