@@ -3,16 +3,16 @@
 namespace App\Listeners;
 
 use App\Events\LessonWatched;
-use App\Services\Achievements\LessonWatched as LessonWatchedService;
+use App\Services\Achievements\Contracts\Achievement as AchievementService;
 
 class UnlockLessonWatchedAchievement
 {
-    private LessonWatchedService $achievement;
+    private AchievementService $achievement;
 
     /**
      * Create the event listener.
      */
-    public function __construct(LessonWatchedService $achievement)
+    public function __construct(AchievementService $achievement)
     {
         $this->achievement = $achievement;
     }
@@ -22,6 +22,6 @@ class UnlockLessonWatchedAchievement
      */
     public function handle(LessonWatched $event): void
     {
-        $this->achievement->unlock($event->user);
+        $this->achievement->unlock($event->user, $event);
     }
 }

@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Services\Achievements\Achievement as AchievementService;
+use App\Services\Achievements\Contracts\Achievement as AchievementContract;
+use App\Services\Badge\Badge as BadgeService;
+use App\Services\Badge\Contracts\Badge as BadgeServiceContract;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +15,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(AchievementContract::class, AchievementService::class);
+        $this->app->bind(BadgeServiceContract::class, BadgeService::class);
     }
 
     /**

@@ -12,8 +12,7 @@ use Database\Seeders\BadgeSeeder;
 use App\Listeners\UnlockLessonWatchedAchievement;
 use App\Listeners\UnlockCommentWrittenAchievement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Services\Achievements\LessonWatched as LessonWatchedService;
-use App\Services\Achievements\CommentWritten as CommentWrittenService;
+use App\Services\Achievements\Contracts\Achievement as AchievementService;
 
 class BadgeTest extends TestCase
 {
@@ -45,7 +44,7 @@ class BadgeTest extends TestCase
             $event = new CommentWritten($comment);
 
             $listener = new UnlockCommentWrittenAchievement(
-                new CommentWrittenService()
+                resolve(AchievementService::class)
             );
 
             $listener->handle($event);
@@ -64,7 +63,7 @@ class BadgeTest extends TestCase
             $event = new LessonWatched($lesson, $this->user->fresh());
 
             $listener = new UnlockLessonWatchedAchievement(
-                new LessonWatchedService()
+                resolve(AchievementService::class)
             );
 
             $listener->handle($event);

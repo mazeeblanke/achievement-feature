@@ -4,9 +4,9 @@ namespace App\Services\Achievements\Contracts;
 
 use App\Models\User;
 
-interface Achievement
+interface AchievementType
 {
-    public function unlock(User $user, $event): bool;
+    public function unlock(User $user): bool;
 
     public function unlockedAchievements(User $user): array;
 

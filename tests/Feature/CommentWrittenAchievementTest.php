@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Event;
 use Database\Seeders\AchievementSeeder;
 use App\Listeners\UnlockCommentWrittenAchievement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Services\Achievements\CommentWritten as CommentWrittenService;
+use App\Services\Achievements\Contracts\Achievement as AchievementService;
+
 
 class CommentWrittenAchievementTest extends TestCase
 {
@@ -59,7 +60,7 @@ class CommentWrittenAchievementTest extends TestCase
             $event = new CommentWritten($comment);
 
             $listener = new UnlockCommentWrittenAchievement(
-                new CommentWrittenService()
+                resolve(AchievementService::class)
             );
 
             $listener->handle($event);

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Event;
 use Database\Seeders\AchievementSeeder;
 use App\Listeners\UnlockLessonWatchedAchievement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Services\Achievements\LessonWatched as LessonWatchedService;
+use App\Services\Achievements\Contracts\Achievement as AchievementService;
 
 class LessonWatchedAchievementTest extends TestCase
 {
@@ -48,7 +48,7 @@ class LessonWatchedAchievementTest extends TestCase
             $event = new LessonWatched($lesson, $this->user->fresh());
 
             $listener = new UnlockLessonWatchedAchievement(
-                new LessonWatchedService()
+                resolve(AchievementService::class)
             );
 
             $listener->handle($event);

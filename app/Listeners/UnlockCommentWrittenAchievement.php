@@ -3,16 +3,16 @@
 namespace App\Listeners;
 
 use App\Events\CommentWritten;
-use App\Services\Achievements\CommentWritten as CommentWrittenService;
+use App\Services\Achievements\Contracts\Achievement as AchievementService;
 
 class UnlockCommentWrittenAchievement
 {
-    private CommentWrittenService $achievement;
+    private AchievementService $achievement;
 
     /**
      * Create the event listener.
      */
-    public function __construct(CommentWrittenService $achievement)
+    public function __construct(AchievementService $achievement)
     {
         $this->achievement = $achievement;
     }
@@ -25,7 +25,7 @@ class UnlockCommentWrittenAchievement
         $user = $event->comment->user;
 
         if ($user) {
-            $this->achievement->unlock($user);
+            $this->achievement->unlock($user, $event);
         }
     }
 }
