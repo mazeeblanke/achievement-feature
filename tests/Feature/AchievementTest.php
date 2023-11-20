@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
+use Tests\TestCase;
 use App\Models\User;
+use Tests\Traits\Achievement;
 use Database\Seeders\BadgeSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\Achievement;
 
 class AchievementTest extends TestCase
 {
@@ -51,7 +51,7 @@ class AchievementTest extends TestCase
             'next_available_achievements',
             'current_badge',
             'next_badge',
-            'remaining_to_unlock_next_badge'
+            'remaining_to_unlock_next_badge',
         ]);
     }
 
@@ -88,18 +88,17 @@ class AchievementTest extends TestCase
             'unlocked_achievements' => [
                 'First Comment Written',
                 'First Lesson Watched',
-                '5 Lessons Watched'
+                '5 Lessons Watched',
             ],
             'next_available_achievements' => [
                 '3 Comments Written',
-               '10 Lessons Watched'
+                '10 Lessons Watched',
             ],
             'current_badge' => BadgeSeeder::BEGINNER,
             'next_badge' => BadgeSeeder::INTERMEDIATE,
-            'remaining_to_unlock_next_badge' => 1
+            'remaining_to_unlock_next_badge' => 1,
         ]);
     }
-
 
     /**
      * @test
@@ -122,15 +121,15 @@ class AchievementTest extends TestCase
                 'First Lesson Watched',
                 '5 Lessons Watched',
                 '10 Lessons Watched',
-                '25 Lessons Watched'
+                '25 Lessons Watched',
             ],
             'next_available_achievements' => [
                 '20 Comments Written',
-                '50 Lessons Watched'
+                '50 Lessons Watched',
             ],
             'current_badge' => BadgeSeeder::ADVANCED,
             'next_badge' => BadgeSeeder::MASTER,
-            'remaining_to_unlock_next_badge' => 2
+            'remaining_to_unlock_next_badge' => 2,
         ]);
     }
 }

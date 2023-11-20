@@ -2,13 +2,13 @@
 
 namespace Tests\Traits;
 
-use App\Events\CommentWritten;
-use App\Events\LessonWatched;
-use App\Listeners\UnlockCommentWrittenAchievement;
-use App\Listeners\UnlockLessonWatchedAchievement;
-use App\Services\Achievements\Contracts\Achievement as AchievementService;
-use App\Models\Comment;
 use App\Models\Lesson;
+use App\Models\Comment;
+use App\Events\LessonWatched;
+use App\Events\CommentWritten;
+use App\Listeners\UnlockLessonWatchedAchievement;
+use App\Listeners\UnlockCommentWrittenAchievement;
+use App\Services\Achievements\Contracts\Achievement as AchievementService;
 
 trait Achievement
 {

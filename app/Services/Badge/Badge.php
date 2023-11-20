@@ -5,21 +5,29 @@ namespace App\Services\Badge;
 use App\Models\User;
 use App\Events\BadgeUnlocked;
 use App\Models\Badge as ModelsBadge;
-use App\Services\Badge\Contracts\Badge as BadgeContract;
 use Illuminate\Database\Eloquent\Collection;
+use App\Services\Badge\Contracts\Badge as BadgeContract;
 
 class Badge implements BadgeContract
 {
     public function getCurrentBadge(User $user): string
     {
-        return $user->badge->name;
+        $badge = $user->badge;
+
+        if(!$badge) {
+            $defaultBadge = ModelsBadge::where('no_of_achievements', 0)->first();
+            $user->badge()->associate($defaultBadge);
+        }
+
+        return $user->fresh()->badge->name ?? '';
     }
 
     public function getNextBadge(User $user): string
     {
         $currentBadge = $user->badge;
+        $numberOfAchievements = $currentBadge->no_of_achievements ?? 0;
 
-        $badges = ModelsBadge::where('no_of_achievements', '>', $currentBadge->no_of_achievements)
+        $badges = ModelsBadge::where('no_of_achievements', '>', $numberOfAchievements)
             ->orderBy('no_of_achievements')
             ->get();
 
@@ -28,7 +36,11 @@ class Badge implements BadgeContract
         return $newBadge ? $newBadge->name : '';
     }
 
-    private function getBadges(ModelsBadge $currentBadge): Collection
+    /**
+     *
+     * @return Collection<int, ModelsBadge>
+     */
+    private function getBadges(ModelsBadge|null $currentBadge)
     {
         $currentNumberOfAchievements = $currentBadge->no_of_achievements ?? 0;
 

@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\User;
+use Tests\Traits\Achievement;
 use Database\Seeders\BadgeSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\Achievement;
 
 class BadgeTest extends TestCase
 {

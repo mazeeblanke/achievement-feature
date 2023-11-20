@@ -3,12 +3,12 @@
 namespace App\Services\Achievements;
 
 use App\Models\User;
+use App\Models\Achievement;
 use App\Models\AchievementType;
 use App\Events\AchievementUnlocked;
 use Database\Seeders\AchievementSeeder;
-use App\Models\Achievement;
-use App\Services\Achievements\Contracts\AchievementType as AchievementContract;
 use Illuminate\Database\Eloquent\Collection;
+use App\Services\Achievements\Contracts\AchievementType as AchievementContract;
 
 class CommentWritten implements AchievementContract
 {
@@ -22,7 +22,9 @@ class CommentWritten implements AchievementContract
             ->orderByDesc('qualifier')
             ->first();
 
-        if(!$latestAchievement) return $nextAchievement;
+        if(!$latestAchievement) {
+            return $nextAchievement;
+        }
 
         $achievement = Achievement::where('achievement_type_id', $type->id)
             ->where('qualifier', '>', $latestAchievement->qualifier)

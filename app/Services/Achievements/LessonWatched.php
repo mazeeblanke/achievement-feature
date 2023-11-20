@@ -7,6 +7,7 @@ use App\Models\Achievement;
 use App\Models\AchievementType;
 use App\Events\AchievementUnlocked;
 use Database\Seeders\AchievementSeeder;
+use Illuminate\Database\Eloquent\Collection;
 use App\Services\Achievements\Contracts\AchievementType as AchievementContract;
 
 class LessonWatched implements AchievementContract
@@ -21,7 +22,9 @@ class LessonWatched implements AchievementContract
             ->orderByDesc('qualifier')
             ->first();
 
-        if(!$latestAchievement) return $nextAchievement;
+        if(!$latestAchievement) {
+            return $nextAchievement;
+        }
 
         $achievement = Achievement::where('achievement_type_id', $type->id)
             ->where('qualifier', '>', $latestAchievement->qualifier)
@@ -68,7 +71,7 @@ class LessonWatched implements AchievementContract
     /**
      * Get all achievements that can be unlocked
      *
-     * @return Collection<Achievement>
+     * @return Collection<int, Achievement>
     */
     private function getUnlockableAchievements(AchievementType $achievementType, User $user, int $totalWatched)
     {

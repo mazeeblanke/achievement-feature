@@ -2,27 +2,34 @@
 
 namespace App\Services\Achievements;
 
-use App\Events\CommentWritten;
-use App\Events\LessonWatched;
-use App\Services\Achievements\CommentWritten as CommentWrittenService;
-use App\Services\Achievements\LessonWatched as LessonWatchedService;
 use App\Models\User;
+use App\Events\LessonWatched;
+use App\Events\CommentWritten;
+use App\Services\Achievements\LessonWatched as LessonWatchedService;
+use App\Services\Achievements\CommentWritten as CommentWrittenService;
 
 class Achievement implements Contracts\Achievement
 {
-    protected array $achievementServices = [
-       CommentWritten::class => CommentWrittenService::class,
-       LessonWatched::class => LessonWatchedService::class
+    /**
+     *
+     * @var array<string, string>
+     */
+    protected $achievementServices = [
+        CommentWritten::class => CommentWrittenService::class,
+        LessonWatched::class => LessonWatchedService::class,
     ];
 
-    public function unlock(User $user, $event): bool
+    public function unlock(User $user, Object $event): bool
     {
         $eventClass = get_class($event);
 
         if (isset($this->achievementServices[$eventClass])) {
             $achievementServiceClass = $this->achievementServices[$eventClass];
             $achievementService = new $achievementServiceClass();
-            return $achievementService->unlock($user);
+
+            if ($achievementService instanceof Contracts\AchievementType) {
+                return $achievementService->unlock($user);
+            }
         }
 
         return false;
@@ -41,7 +48,10 @@ class Achievement implements Contracts\Achievement
 
         foreach ($this->achievementServices as $achievementServiceClass) {
             $achievementService = new $achievementServiceClass();
-            $nextAvailableAchievements[] = $achievementService->nextAvailableAchievements($user);
+
+            if($achievementService instanceof Contracts\AchievementType) {
+                $nextAvailableAchievements[] = $achievementService->nextAvailableAchievements($user);
+            }
         }
 
         return $nextAvailableAchievements;
