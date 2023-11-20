@@ -10,7 +10,7 @@ use App\Models\User;
 
 class Achievement implements Contracts\Achievement
 {
-    protected $achievementServices = [
+    protected array $achievementServices = [
        CommentWritten::class => CommentWrittenService::class,
        LessonWatched::class => LessonWatchedService::class
     ];
@@ -37,6 +37,13 @@ class Achievement implements Contracts\Achievement
 
     public function nextAvailableAchievements(User $user): array
     {
-        return [];
+        $nextAvailableAchievements = [];
+
+        foreach ($this->achievementServices as $achievementServiceClass) {
+            $achievementService = new $achievementServiceClass();
+            $nextAvailableAchievements[] = $achievementService->nextAvailableAchievements($user);
+        }
+
+        return $nextAvailableAchievements;
     }
 }

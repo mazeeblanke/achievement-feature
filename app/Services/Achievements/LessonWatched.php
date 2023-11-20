@@ -13,22 +13,66 @@ class LessonWatched implements AchievementContract
 {
     public function nextAvailableAchievements(User $user): string
     {
-        return '';
+        $type = $this->getAchievementType();
+        $nextAchievement = '';
+
+        $latestAchievement = $user->achievements()
+            ->where('achievement_type_id', $type->id)
+            ->orderByDesc('qualifier')
+            ->first();
+
+        if(!$latestAchievement) return $nextAchievement;
+
+        $achievement = Achievement::where('achievement_type_id', $type->id)
+            ->where('qualifier', '>', $latestAchievement->qualifier)
+            ->orderBy('qualifier')
+            ->first();
+
+        $nextAchievement = $achievement->name ?? '';
+
+        return $nextAchievement;
     }
 
     public function unlock(User $user): bool
     {
         $totalWatched = $user->watched()->count();
 
+        $unlockableAchievements = $this->getUnlockableAchievements(
+            $this->getAchievementType(),
+            $user,
+            $totalWatched
+        );
+
+        // Unlock all applicable achievements
+        foreach ($unlockableAchievements as $achievement) {
+            $user->achievements()->attach($achievement->id);
+            AchievementUnlocked::dispatch((string)$achievement->name, $user);
+        }
+
+        return $unlockableAchievements->count() > 0;
+    }
+
+    private function getAchievementType(): AchievementType
+    {
         $achievementType = AchievementType::whereName(
             AchievementSeeder::LESSON_TYPE
         )->first();
 
         if (!$achievementType) {
-            throw new \Exception('Lesson Achievement Type not found');
+            throw new \Exception('Lesson Achievement type not found');
         }
 
-        $achievements = Achievement::where('achievement_type_id', $achievementType->id)
+        return $achievementType;
+    }
+
+    /**
+     * Get all achievements that can be unlocked
+     *
+     * @return Collection<Achievement>
+    */
+    private function getUnlockableAchievements(AchievementType $achievementType, User $user, int $totalWatched)
+    {
+        $allAchievements = Achievement::where('achievement_type_id', $achievementType->id)
             ->orderBy('qualifier')
             ->get();
 
@@ -36,18 +80,10 @@ class LessonWatched implements AchievementContract
             ->pluck('id')
             ->toArray();
 
-        $unlockedAchievements = $achievements->filter(
+        return $allAchievements->filter(
             fn ($achievement) =>
             !in_array($achievement->id, $unlockedAchievements) &&
             $totalWatched >= $achievement->qualifier
         );
-
-        // Unlock all applicable achievements
-        foreach ($unlockedAchievements as $achievement) {
-            $user->achievements()->attach($achievement->id);
-            AchievementUnlocked::dispatch((string)$achievement->name, $user);
-        }
-
-        return $unlockedAchievements->count() > 0;
     }
 }

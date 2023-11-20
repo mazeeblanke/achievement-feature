@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Events\BadgeUnlocked;
 use App\Models\Badge as ModelsBadge;
 use App\Services\Badge\Contracts\Badge as BadgeContract;
+use Illuminate\Database\Eloquent\Collection;
 
 class Badge implements BadgeContract
 {
@@ -27,18 +28,13 @@ class Badge implements BadgeContract
         return $newBadge ? $newBadge->name : '';
     }
 
-    private function getNewBadge(ModelsBadge $currentBadge, int $numberOfAchievements): ModelsBadge|null
+    private function getBadges(ModelsBadge $currentBadge): Collection
     {
         $currentNumberOfAchievements = $currentBadge->no_of_achievements ?? 0;
 
-        $badges = ModelsBadge::where('no_of_achievements', '>', $currentNumberOfAchievements)
+        return ModelsBadge::where('no_of_achievements', '>', $currentNumberOfAchievements)
             ->orderBy('no_of_achievements')
             ->get();
-
-        return $badges->first(
-            fn ($badge) =>
-            $badge->no_of_achievements <= $numberOfAchievements
-        );
     }
 
     public function unlock(User $user): bool
@@ -46,7 +42,12 @@ class Badge implements BadgeContract
         $numberOfAchievements = $user->achievements()->count();
         $currentBadge = $user->badge;
 
-        $newBadge = $this->getNewBadge($currentBadge, $numberOfAchievements);
+        $badges = $this->getBadges($currentBadge);
+
+        $newBadge = $badges->first(
+            fn ($badge) =>
+            $badge->no_of_achievements <= $numberOfAchievements
+        );
 
         if ($newBadge) {
             $user->badge()->associate($newBadge);
@@ -62,8 +63,13 @@ class Badge implements BadgeContract
         $numberOfAchievements = $user->achievements()->count();
         $currentBadge = $user->badge;
 
-        $newBadge = $this->getNewBadge($currentBadge, $numberOfAchievements);
+        $badges = $this->getBadges($currentBadge);
 
-        return $newBadge ? $newBadge->no_of_achievements - $numberOfAchievements : 0;
+        $nextBadge = $badges->first(
+            fn ($badge) =>
+            $badge->no_of_achievements >= $numberOfAchievements
+        );
+
+        return $nextBadge ? $nextBadge->no_of_achievements - $numberOfAchievements : 0;
     }
 }

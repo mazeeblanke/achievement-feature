@@ -8,18 +8,30 @@ use App\Events\AchievementUnlocked;
 use Database\Seeders\AchievementSeeder;
 use App\Models\Achievement;
 use App\Services\Achievements\Contracts\AchievementType as AchievementContract;
+use Illuminate\Database\Eloquent\Collection;
 
 class CommentWritten implements AchievementContract
 {
     public function nextAvailableAchievements(User $user): string
     {
         $type = $this->getAchievementType();
+        $nextAchievement = '';
 
         $latestAchievement = $user->achievements()
             ->where('achievement_type_id', $type->id)
-            ->orderBy('qualifier');
-            
-        return '';
+            ->orderByDesc('qualifier')
+            ->first();
+
+        if(!$latestAchievement) return $nextAchievement;
+
+        $achievement = Achievement::where('achievement_type_id', $type->id)
+            ->where('qualifier', '>', $latestAchievement->qualifier)
+            ->orderBy('qualifier')
+            ->first();
+
+        $nextAchievement = $achievement->name ?? '';
+
+        return $nextAchievement;
     }
 
     public function unlock(User $user): bool
@@ -54,6 +66,11 @@ class CommentWritten implements AchievementContract
         return $achievementType;
     }
 
+    /**
+     * Get all achievements that can be unlocked
+     *
+     * @return Collection<Achievement>
+     */
     private function getUnlockableAchievements(AchievementType $achievementType, User $user, int $totalComments)
     {
         $allAchievements = Achievement::where('achievement_type_id', $achievementType->id)
