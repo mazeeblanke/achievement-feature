@@ -8,7 +8,16 @@ use App\Services\Achievements\Contracts\Achievement as AchievementService;
 
 class AchievementsController extends Controller
 {
-    public function index(User $user, BadgeService $badgeService, AchievementService $achievementService): \Illuminate\Http\JsonResponse
+    /**
+     * Get the achievements for the given user.
+     *
+     * @param   User                $user
+     * @param   BadgeService        $badgeService
+     * @param   AchievementService  $achievementService
+     *
+     * @return  \Illuminate\Http\JsonResponse
+     */
+    public function index($user, $badgeService, $achievementService)
     {
         return response()->json([
             'unlocked_achievements' => $achievementService->unlockedAchievements($user),

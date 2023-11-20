@@ -30,6 +30,6 @@ Tests are found in the test directory.
 
 RUN `php artisan test`
 
-RUN `./vendor/bin/php-cs-fixer fix --config php-cs-fixer.php` to fix code
+RUN `./vendor/bin/php-cs-fixer fix` to fix code
 
 RUN `./vendor/bin/phpstan analyse --memory-limit=2G` for static analysis

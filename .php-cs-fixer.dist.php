@@ -1,10 +1,7 @@
 <?php
 
 $finder = Symfony\Component\Finder\Finder::create()
-    ->in([
-        __DIR__ . '/tests',
-    ])
-    ->in(__DIR__)
+    ->in([__DIR__ . '/app', __DIR__ . '/tests', __DIR__ . '/database'])
     ->exclude(['bootstrap', 'storage', 'vendor','docker'])
     ->name('*.php')
     ->name('_ide_helper')
