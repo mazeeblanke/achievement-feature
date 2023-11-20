@@ -3,17 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\Badge\Contracts\Badge as BadgeService;
 
 class AchievementsController extends Controller
 {
-    public function index(User $user): \Illuminate\Http\JsonResponse
+    public function index(User $user, BadgeService $badgeService): \Illuminate\Http\JsonResponse
     {
         return response()->json([
             'unlocked_achievements' => [],
             'next_available_achievements' => [],
-            'current_badge' => '',
-            'next_badge' => '',
-            'remaing_to_unlock_next_badge' => 0,
+            'current_badge' => $badgeService->getCurrentBadge($user),
+            'next_badge' => $badgeService->getNextBadge($user),
+            'remaing_to_unlock_next_badge' => $badgeService->achievementsCountTillNextBadge($user),
         ]);
     }
 }
