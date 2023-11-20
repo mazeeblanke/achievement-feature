@@ -11,10 +11,15 @@ use SlevomatCodingStandard\Sniffs\TypeHints\PropertyTypeHintSniff;
 use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenPrivateMethods;
 use SlevomatCodingStandard\Sniffs\TypeHints\ParameterTypeHintSniff;
 use NunoMaduro\PhpInsights\Domain\Insights\ForbiddenDefineFunctions;
+use SlevomatCodingStandard\Sniffs\Classes\ForbiddenPublicPropertySniff;
+use SlevomatCodingStandard\Sniffs\Classes\ModernClassNameReferenceSniff;
 use SlevomatCodingStandard\Sniffs\TypeHints\DeclareStrictTypesSniff;
 use SlevomatCodingStandard\Sniffs\TypeHints\DisallowMixedTypeHintSniff;
 use SlevomatCodingStandard\Sniffs\Namespaces\AlphabeticallySortedUsesSniff;
 use SlevomatCodingStandard\Sniffs\Commenting\UselessFunctionDocCommentSniff;
+use SlevomatCodingStandard\Sniffs\ControlStructures\DisallowEmptySniff;
+use SlevomatCodingStandard\Sniffs\ControlStructures\DisallowShortTernaryOperatorSniff;
+use SlevomatCodingStandard\Sniffs\TypeHints\DisallowArrayTypeHintSyntaxSniff;
 
 return [
 
@@ -85,6 +90,11 @@ return [
         PropertyTypeHintSniff::class,
         ReturnTypeHintSniff::class,
         UselessFunctionDocCommentSniff::class,
+        ForbiddenPublicPropertySniff::class,
+        DisallowEmptySniff::class,
+        DisallowShortTernaryOperatorSniff::class,
+        ModernClassNameReferenceSniff::class,
+        DisallowArrayTypeHintSyntaxSniff::class,
     ],
 
     'config' => [
